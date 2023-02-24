@@ -3,6 +3,7 @@ package utilities;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
@@ -16,43 +17,46 @@ public class Driver {
     Ikinci olarak driver'i kapatacagimiz zaman public static void closeDriver() method olusturmak. Istedigimiz zaman
     bu methodla driver'i kapatacagiz.
     */
-   static WebDriver driver;
+   //    Driver.getDriver(); -> driver
+   private static WebDriver driver;
+    //    Driver.getDriver(); -> driver
 
+    //    getDriver() is used to instantiate the driver object
     public static WebDriver getDriver(){
-        if (driver==null){//Eger driver'a deger atanmamissa deger ata,Eger atanmissa driver'i ayni sayfada return et.
-            switch (ConfigReader.getProperty("browser")){
+        if (driver==null){
+            switch (ConfigReader.getProperty("browser")) {
                 case "chrome":
                     WebDriverManager.chromedriver().setup();
                     driver = new ChromeDriver();
                     break;
                 case "firefox":
                     WebDriverManager.firefoxdriver().setup();
-                    driver = new FirefoxDriver();
+                    driver=new FirefoxDriver();
+                    break;
+                case "chrome-headless":
+                    WebDriverManager.chromedriver().setup();
+                    driver = new ChromeDriver(new ChromeOptions().setHeadless(true));
                     break;
                 case "edge":
                     WebDriverManager.edgedriver().setup();
-                    driver = new EdgeDriver();
+                    driver=new EdgeDriver();
                     break;
             }
-            WebDriverManager.chromedriver().setup();
-            driver=new ChromeDriver();
-            driver.manage().window().maximize();
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
-
+//            NOTE: sel 4.5
+//            driver = WebDriverManager.chromedriver().create();
         }
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(15));
+        driver.manage().window().maximize();
         return driver;
     }
+    //    closeDriver() is used to close the driver
     public static void closeDriver(){
-        if (driver!=null){//Driver' a deger atanmissa
-            driver.close();
-            driver=null;
-        }
-
-    }
-    public static void quitDriver() {
-        if (driver != null) {//Driver' a deger atanmissa
+//        if driver is already being used(pointing an object)
+//        then quit the driver
+        if (driver!=null){
             driver.quit();
-            driver = null;
+            driver=null;
         }
     }
 }
